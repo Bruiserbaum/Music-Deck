@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.2
+- The list shows: Music Assistant answers with its rows under `items`, which the deck now reads.
+
 ## 0.1.1
 - When the list does not come, the deck says why: Home Assistant's own words, no answer, or still waiting for
   Tessera just after the screen starts (asked again within seconds).

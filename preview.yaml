@@ -29,10 +29,11 @@ cards:
 
 commands:
   "call_service:music_assistant.get_library":
-    artists: []
-    albums: []
-    tracks: []
-    playlists:
+    limit: 12
+    offset: 0
+    order_by: sort_name
+    media_type: playlist
+    items:
       - { media_type: playlist, uri: "library://playlist/60", name: "'00s Metal", version: "", favorite: false }
       - { media_type: playlist, uri: "library://playlist/4", name: "500 Random tracks (from library)", version: "", favorite: false }
       - { media_type: playlist, uri: "library://playlist/52", name: "90s-00s Hits", version: "", favorite: false }
@@ -45,6 +46,3 @@ commands:
       - { media_type: playlist, uri: "library://playlist/75", name: "Grunge Essentials", version: "", favorite: false }
       - { media_type: playlist, uri: "library://playlist/76", name: "Road Trip", version: "", favorite: false }
       - { media_type: playlist, uri: "library://playlist/77", name: "Workout Mix", version: "", favorite: false }
-    radio: []
-    audiobooks: []
-    podcasts: []

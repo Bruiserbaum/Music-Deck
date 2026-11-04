@@ -4,7 +4,7 @@
 # Music Assistant holds every account (YouTube Music, Spotify, ...), the screen never sees a login.
 # docs/MANIFEST.md in the plugins repository has every field.
 id: music_deck
-version: 0.1.1
+version: 0.1.2
 # 0.12 a card's taps and actions with a JSON object, 0.14 wish(), 0.15 the extra speakers as entity options, 0.17 the
 # cover of what plays by name (cover:<entity>).
 api: "0.17"

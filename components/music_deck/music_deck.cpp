@@ -304,7 +304,7 @@ class Deck : public tessera::InPsram {
     return true;
   }
 
-  // An answer of the app: {"re", "ok", "result": {"playlists": [{"name", "uri", ...}], ...}}.
+  // An answer of the app: {"re", "ok", "result": {"items": [{"name", "uri", ...}], ...}}.
   void answer(JsonObjectConst m) {
     if (!asked_ || (m["re"] | 0u) != asked_) return;
     asked_ = 0;
@@ -315,7 +315,10 @@ class Deck : public tessera::InPsram {
       keep(error_, m["error"] | "");
       wait_ = plugin_->entry()[0] ? Wait::FAILED : Wait::NO_ENTRY;
     } else {
-      for (JsonObjectConst item : m["result"][shelf(setup_.kind)].as<JsonArrayConst>()) {
+      // get_library answers {"items": [...], "limit", "offset", ...}; a list by its kind ("playlists") is taken too.
+      JsonArrayConst list = m["result"]["items"].as<JsonArrayConst>();
+      if (list.isNull()) list = m["result"][shelf(setup_.kind)].as<JsonArrayConst>();
+      for (JsonObjectConst item : list) {
         if (items_count_ >= rows_) break;
         Item &it = items_[items_count_];
         keep(it.name, item["name"] | "");
