@@ -238,10 +238,13 @@ class Deck : public tessera::InPsram {
     // No answer within a while is no answer; a page that did not come is asked again now and then.
     if (asked_ && now - asked_at_ > 15000) {
       asked_ = 0;
-      wait_ = Wait::FAILED;
+      wait_ = Wait::NO_ANSWER;
       paint_list();
     }
-    if (!asked_ && wait_ == Wait::FAILED && now - asked_at_ > 30000) ask();
+    // Not sent (the screen not yet linked to the app, as just after it starts): again soon; a refusal or no answer
+    // now and then.
+    if (!asked_ && wait_ == Wait::OFFLINE && now - asked_at_ > 5000) ask();
+    if (!asked_ && (wait_ == Wait::FAILED || wait_ == Wait::NO_ANSWER) && now - asked_at_ > 30000) ask();
   }
 
   // A tap on the deck; false when it hit none of its parts (a small tile then opens the card).
@@ -308,6 +311,8 @@ class Deck : public tessera::InPsram {
     items_count_ = 0;
     more_ = false;
     if (!(m["ok"] | false)) {
+      // Home Assistant's own words for the refusal, as the app passes them on.
+      keep(error_, m["error"] | "");
       wait_ = plugin_->entry()[0] ? Wait::FAILED : Wait::NO_ENTRY;
     } else {
       for (JsonObjectConst item : m["result"][shelf(setup_.kind)].as<JsonArrayConst>()) {
@@ -333,7 +338,7 @@ class Deck : public tessera::InPsram {
   }
 
  private:
-  enum class Wait : uint8_t { NONE, LOADING, EMPTY, FAILED, NO_ENTRY };
+  enum class Wait : uint8_t { NONE, LOADING, EMPTY, FAILED, NO_ENTRY, NO_ANSWER, OFFLINE };
   struct Item {
     char name[52] = {};
     char uri[52] = {};
@@ -474,7 +479,7 @@ class Deck : public tessera::InPsram {
     if (f.favorite) d["favorite"] = true;
     if (setup_.contains[0]) d["search"] = setup_.contains;
     asked_ = tessera::send(plugin_, r.as<JsonObjectConst>());
-    wait_ = asked_ ? Wait::LOADING : Wait::FAILED;
+    wait_ = asked_ ? Wait::LOADING : Wait::OFFLINE;
     paint_list();
   }
 
@@ -561,8 +566,11 @@ class Deck : public tessera::InPsram {
       ui::set_color(r.label, sent ? theme::ON_ACCENT : theme::INK);
     }
     const char *why = wait_ == Wait::LOADING ? "loading" : wait_ == Wait::EMPTY ? "empty"
-                      : wait_ == Wait::FAILED ? "failed" : wait_ == Wait::NO_ENTRY ? "no_entry" : nullptr;
-    ui::set_text(note_, why ? plugin_->text(why) : "");
+                      : wait_ == Wait::FAILED ? "failed" : wait_ == Wait::NO_ENTRY ? "no_entry"
+                      : wait_ == Wait::NO_ANSWER ? "no_answer" : wait_ == Wait::OFFLINE ? "offline" : nullptr;
+    std::string note = why ? plugin_->text(why) : "";
+    if (wait_ == Wait::FAILED) note = tessera::fill(note.c_str(), "reason", error_[0] ? error_ : "?");
+    ui::set_text(note_, note);
     ui::set_color(note_, theme::MUTED);
     // The page keys: lit where they lead somewhere.
     ui::set_fill(left_.box, Tone::NORMAL, surface_);
@@ -583,6 +591,7 @@ class Deck : public tessera::InPsram {
   Wait wait_ = Wait::NONE;
   theme::Role surface_ = theme::RAISED;
   uint32_t asked_ = 0, asked_at_ = 0, sent_at_ = 0;
+  char error_[124] = {};
   Part play_, next_, previous_, left_, right_;
   Part speaker_chips_[SPEAKERS], filter_chips_[FILTERS], rows_parts_[ROWS];
   lv_obj_t *title_{}, *artist_{}, *art_{}, *art_icon_{}, *cover_{}, *note_{};
