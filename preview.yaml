@@ -1,0 +1,50 @@
+# What tools/preview.py shows (docs/PREVIEW.md): a Music Assistant player that plays, a second speaker, and a page of
+# playlists as music_assistant.get_library answers it. Never put a secret here.
+tiles:
+  - tile: deck
+    name: Music
+    entity: media_player.living_room
+    options: { speaker_2: media_player.kitchen, filters: [all, favorites, recent, most] }
+  - tile: deck
+    name: Kitchen
+    entity: media_player.kitchen
+    sizes: [1x1, 2x1]
+
+states:
+  media_player.living_room:
+    state: playing
+    attributes:
+      friendly_name: Living room
+      mass_player_type: player
+      media_title: Chop Suey!
+      media_artist: System Of A Down
+  media_player.kitchen:
+    state: idle
+    attributes:
+      friendly_name: Kitchen
+      mass_player_type: player
+
+cards:
+  - { card: deck, entity: media_player.living_room }
+
+commands:
+  "call_service:music_assistant.get_library":
+    artists: []
+    albums: []
+    tracks: []
+    playlists:
+      - { media_type: playlist, uri: "library://playlist/60", name: "'00s Metal", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/4", name: "500 Random tracks (from library)", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/52", name: "90s-00s Hits", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/50", name: "Aggro Anthems", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/1", name: "All favorited tracks", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/71", name: "Chill Evening", version: "", favorite: true }
+      - { media_type: playlist, uri: "library://playlist/72", name: "Coffee Shop Acoustic", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/73", name: "Deep Focus", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/74", name: "Friday Night Rock", version: "", favorite: true }
+      - { media_type: playlist, uri: "library://playlist/75", name: "Grunge Essentials", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/76", name: "Road Trip", version: "", favorite: false }
+      - { media_type: playlist, uri: "library://playlist/77", name: "Workout Mix", version: "", favorite: false }
+    radio: []
+    audiobooks: []
+    podcasts: []

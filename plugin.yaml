@@ -1,0 +1,7 @@
+# What a screen gets when it takes this plugin. Tessera includes this file from the screen's <name>.plugins.yaml with
+# ENTRY filled in (the Music Assistant entry given when the plugin was added), and adds the components folder beside it.
+defaults:
+  ENTRY: ""
+
+music_deck:
+  entry: "${ENTRY}"
