@@ -17,6 +17,7 @@
     "offline": "Waiting for Tessera…",
     "no_entry": "Fill in the Music Assistant ID in the plugin's settings",
     "no_player": "Choose a Music Assistant player",
+    "pick_player": "No speaker yet: pick a Music Assistant player for this tile in Tessera's Layout",
     "starting": "Starting on {player}",
     "page": "Page {n}"
   },

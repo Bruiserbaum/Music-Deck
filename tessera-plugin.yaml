@@ -4,7 +4,7 @@
 # Music Assistant holds every account (YouTube Music, Spotify, ...), the screen never sees a login.
 # docs/MANIFEST.md in the plugins repository has every field.
 id: music_deck
-version: 0.1.2
+version: 0.1.3
 # 0.12 a card's taps and actions with a JSON object, 0.14 wish(), 0.15 the extra speakers as entity options, 0.17 the
 # cover of what plays by name (cover:<entity>).
 api: "0.17"
@@ -43,7 +43,6 @@ tiles:
     pictures: 1
     # The tile's own player: a Music Assistant player (only those carry `mass_player_type`).
     domains: [media_player]
-    has_attributes: [mass_player_type]
     attributes: [media_title, media_artist]
     example: tile_example
     preview: { title: "{media_title}", badge: "{state}" }

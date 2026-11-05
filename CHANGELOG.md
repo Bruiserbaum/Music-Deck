@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+- A tap on a row without a speaker says where to choose one, instead of nothing.
+- Every media player can be the tile's speaker, also one without Music Assistant's mark.
+
 ## 0.1.2
 - The list shows: Music Assistant answers with its rows under `items`, which the deck now reads.
 

@@ -230,6 +230,10 @@ class Deck : public tessera::InPsram {
   void tick() {
     const uint32_t now = esphome::millis();
     // A started row goes back to the list's look once the speaker had its time to start.
+    if (hint_at_ && now - hint_at_ > 5000) {
+      hint_at_ = 0;
+      paint_list();
+    }
     if (sent_row_ >= 0 && now - sent_at_ > 10000) {
       sent_row_ = -1;
       paint();
@@ -488,7 +492,12 @@ class Deck : public tessera::InPsram {
 
   void play(int i) {
     const Speaker &s = speakers_[at_];
-    if (!s.entity[0]) return;
+    if (!s.entity[0]) {
+      // Nowhere to play: say where a player is chosen, for a few seconds.
+      hint_at_ = esphome::millis();
+      paint_list();
+      return;
+    }
     const Item &it = items_[i];
     JsonDocument d;
     d["media_id"] = !it.uri[0] || maybe_cut(it.uri) ? it.name : it.uri;
@@ -560,7 +569,7 @@ class Deck : public tessera::InPsram {
     if (!full_) return;
     for (int i = 0; i < rows_; ++i) {
       Part &r = rows_parts_[i];
-      const bool there = wait_ == Wait::NONE && i < items_count_;
+      const bool there = wait_ == Wait::NONE && !hint_at_ && i < items_count_;
       r.show(there);
       if (!there) continue;
       ui::set_text(r.label, items_[i].name);
@@ -573,6 +582,7 @@ class Deck : public tessera::InPsram {
                       : wait_ == Wait::NO_ANSWER ? "no_answer" : wait_ == Wait::OFFLINE ? "offline" : nullptr;
     std::string note = why ? plugin_->text(why) : "";
     if (wait_ == Wait::FAILED) note = tessera::fill(note.c_str(), "reason", error_[0] ? error_ : "?");
+    if (hint_at_) note = plugin_->text("pick_player");
     ui::set_text(note_, note);
     ui::set_color(note_, theme::MUTED);
     // The page keys: lit where they lead somewhere.
@@ -593,7 +603,7 @@ class Deck : public tessera::InPsram {
   bool full_ = false, merged_ = false, pictures_ = false, more_ = false, all_speakers_ = true, all_filters_ = true;
   Wait wait_ = Wait::NONE;
   theme::Role surface_ = theme::RAISED;
-  uint32_t asked_ = 0, asked_at_ = 0, sent_at_ = 0;
+  uint32_t asked_ = 0, asked_at_ = 0, sent_at_ = 0, hint_at_ = 0;
   char error_[124] = {};
   Part play_, next_, previous_, left_, right_;
   Part speaker_chips_[SPEAKERS], filter_chips_[FILTERS], rows_parts_[ROWS];
