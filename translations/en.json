@@ -1,5 +1,7 @@
 {
-  "_meta": { "name": "English" },
+  "_meta": {
+    "name": "English"
+  },
   "screen": {
     "all": "All",
     "favorites": "Favorites",
@@ -8,8 +10,6 @@
     "added": "New",
     "random": "Shuffle",
     "nothing": "Nothing playing",
-    "idle": "Idle",
-    "off": "Off",
     "loading": "Loading…",
     "empty": "Nothing here",
     "failed": "Home Assistant said: {reason}",
@@ -19,11 +19,14 @@
     "no_player": "Choose a Music Assistant player",
     "pick_player": "No speaker yet: pick a Music Assistant player for this tile in Tessera's Layout",
     "starting": "Starting on {player}",
-    "page": "Page {n}"
+    "elsewhere": "Playing on {player}",
+    "is_off": "{player} is off",
+    "move_here": "Move here",
+    "not_started": "Did not start on {player}"
   },
   "app": {
     "name": "Music deck",
-    "summary": "Your Music Assistant playlists on the screen: filter them, pick a speaker, tap to play.",
+    "summary": "Your Music Assistant library on the screen: speakers down the side, what plays with its controls, your playlists to tap.",
     "tile_name": "Music deck",
     "tile_example": "Your playlists, ready to play",
     "card_name": "Music deck",
@@ -50,7 +53,9 @@
     "speaker_2": "Second speaker",
     "speaker_3": "Third speaker",
     "speaker_4": "Fourth speaker",
-    "speakers_hint": "More Music Assistant players to choose from on the tile, beside its own.",
+    "speaker_5": "Fifth speaker",
+    "speaker_6": "Sixth speaker",
+    "speakers_hint": "More Music Assistant players, down the side of the deck: tap one to play there, its toggle to let it play along.",
     "enqueue": "A tap on a row",
     "enqueue_hint": "What happens to the speaker's queue.",
     "enqueue_replace": "Plays it now, in place of the queue",

@@ -5,8 +5,8 @@
 
 namespace esphome::music_deck {
 
-// The tile's own player and up to three more (the options speaker_2 to speaker_4).
-static constexpr int SPEAKERS = 4;
+// The tile's own player and up to five more (the options speaker_2 to speaker_6).
+static constexpr int SPEAKERS = 6;
 // The filters the manifest offers, in its order.
 static constexpr int FILTERS = 6;
 // Rows of one page at most: twelve items of Music Assistant's answer stay well under the 3.2 KB the app hands on whole
@@ -20,7 +20,7 @@ struct Setup {
   char enqueue[16] = "replace";
   uint8_t filters[FILTERS] = {};   // indexes into the deck's FILTER table
   uint8_t filter_count = 0;
-  char extra[SPEAKERS - 1][72] = {};   // the entity ids of speaker_2 to speaker_4, "" for none
+  char extra[SPEAKERS - 1][72] = {};   // the entity ids of speaker_2 to speaker_6, "" for none
 };
 
 // One speaker the deck plays on, as Home Assistant last said it.
@@ -30,7 +30,13 @@ struct Speaker {
   char state[16] = {};
   char title[52] = {};
   char artist[52] = {};
-  int8_t option = -1;   // which of speaker_2 to speaker_4 it is (0 to 2), -1 for the tile's own player
+  int16_t volume = -1;        // 0 to 100, -1 while Home Assistant does not say
+  bool muted = false;
+  int32_t position = -1;      // seconds into what plays, as of `updated`; -1 for none
+  int32_t duration = -1;      // seconds, -1 for none (a radio stream)
+  uint32_t updated = 0;       // when Home Assistant last set the position, seconds since 1970
+  uint8_t members = 0;        // the deck's speakers in its group (group_members), one bit each
+  int8_t option = -1;         // which of speaker_2 to speaker_6 it is (0 to 4), -1 for the tile's own player
 };
 
 // What a tile hands the card it opens: the card is made after the tap and knows only the entity and the tile.
@@ -38,6 +44,7 @@ struct Handoff : public tessera::InPsram {
   Setup setup;
   Speaker speakers[SPEAKERS];
   int count = 0;
+  int at = 0;   // the chosen speaker
 };
 
 class Deck;

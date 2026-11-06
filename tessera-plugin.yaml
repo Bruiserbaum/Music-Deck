@@ -1,10 +1,10 @@
 # Music deck: your Music Assistant library on the glass. Playlists (or albums, artists, radio) as a list with filters
-# you pick, the speakers you pick beside each other, what plays now with play, pause and skip, and a tap on a row that
-# plays it. The library comes from Music Assistant's own action, music_assistant.get_library, asked through the app;
+# you pick, the speakers you pick down the side (each can play along with the chosen one), what plays now with its
+# cover, progress, keys and volume, and a tap on a row that plays it. The library comes from Music Assistant's own action, music_assistant.get_library, asked through the app;
 # Music Assistant holds every account (YouTube Music, Spotify, ...), the screen never sees a login.
 # docs/MANIFEST.md in the plugins repository has every field.
 id: music_deck
-version: 0.1.3
+version: 0.2.0
 # 0.12 a card's taps and actions with a JSON object, 0.14 wish(), 0.15 the extra speakers as entity options, 0.17 the
 # cover of what plays by name (cover:<entity>).
 api: "0.17"
@@ -19,10 +19,13 @@ boards: any
 flash_kb: 16
 
 permissions:
-  # A row plays on the chosen speaker; the keys play, pause and skip. Play and pause go through wish(), which sends
-  # Home Assistant's own action for them.
-  home_assistant_actions: [music_assistant.play_media, media_player.media_play_pause, media_player.media_next_track,
-                           media_player.media_previous_track]
+  # A row plays on the chosen speaker; the keys play, pause, stop and skip, the bar sets the volume, a toggle lets a
+  # speaker play along (join) or no more (unjoin), and Move here takes the music from another speaker. Play, pause and
+  # mute go through wish(), which sends Home Assistant's own action for them.
+  home_assistant_actions: [music_assistant.play_media, music_assistant.transfer_queue, media_player.media_play_pause,
+                           media_player.media_stop, media_player.media_next_track, media_player.media_previous_track,
+                           media_player.volume_set, media_player.volume_mute, media_player.join,
+                           media_player.unjoin]
   # A page of the library, asked of Music Assistant through the app.
   ha_commands: ["call_service:music_assistant.get_library"]
 
@@ -35,15 +38,16 @@ tiles:
     name: tile_name
     icon: playlist-music
     sizes: { min: 1x1, max: 6x6 }
-    # The full deck on its largest size: a row of what plays (a cover, two lines, three keys), up to four speaker chips
-    # and six filter chips with their words, two page keys, twelve rows, a note; about 50 LVGL objects, and the
-    # speakers and the page of the library in fixed fields.
-    memory: 6500
+    # The full deck on its largest size: six speakers with their toggles, what plays (a cover, two lines, the progress
+    # and its times), five keys and the volume, six filter chips, two page keys, twelve rows and a note; about 100 LVGL
+    # objects, and the speakers and the page of the library in fixed fields.
+    memory: 12000
     # The cover of what the tile's own player plays.
     pictures: 1
-    # The tile's own player: a Music Assistant player (only those carry `mass_player_type`).
+    # The tile's own player: a Music Assistant player. What it plays, how far, how loud, and who plays along.
     domains: [media_player]
-    attributes: [media_title, media_artist]
+    attributes: &player [media_title, media_artist, media_duration, media_position, media_position_updated_at,
+                         volume_level, is_volume_muted, group_members]
     example: tile_example
     preview: { title: "{media_title}", badge: "{state}" }
     options:
@@ -56,12 +60,16 @@ tiles:
                     { value: recent, label: filter_recent }, { value: most, label: filter_most },
                     { value: added, label: filter_added }, { value: random, label: filter_random }] }
       - { id: contains, kind: text, label: contains, hint: contains_hint }
-      - { id: speaker_2, kind: entity, domains: [media_player], attributes: [media_title, media_artist],
-          label: speaker_2, hint: speakers_hint }
-      - { id: speaker_3, kind: entity, domains: [media_player], attributes: [media_title, media_artist],
-          label: speaker_3, hint: speakers_hint }
-      - { id: speaker_4, kind: entity, domains: [media_player], attributes: [media_title, media_artist],
-          label: speaker_4, hint: speakers_hint }
+      - { id: speaker_2, kind: entity, domains: [media_player], attributes: *player, label: speaker_2,
+          hint: speakers_hint }
+      - { id: speaker_3, kind: entity, domains: [media_player], attributes: *player, label: speaker_3,
+          hint: speakers_hint }
+      - { id: speaker_4, kind: entity, domains: [media_player], attributes: *player, label: speaker_4,
+          hint: speakers_hint }
+      - { id: speaker_5, kind: entity, domains: [media_player], attributes: *player, label: speaker_5,
+          hint: speakers_hint }
+      - { id: speaker_6, kind: entity, domains: [media_player], attributes: *player, label: speaker_6,
+          hint: speakers_hint }
       - { id: enqueue, kind: choice, label: enqueue, hint: enqueue_hint, default: replace,
           choices: [{ value: replace, label: enqueue_replace }, { value: play, label: enqueue_play },
                     { value: next, label: enqueue_next }, { value: add, label: enqueue_add }] }
