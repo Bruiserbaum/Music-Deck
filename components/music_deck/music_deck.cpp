@@ -258,7 +258,6 @@ class Deck : public tessera::InPsram {
       const bool on = count_ && playing(speakers_[at_]);
       if ((on && now - sent_at_ > 3000) || now - sent_at_ > 12000) {
         starting_ = false;
-        lit_row_ = -1;
         if (!on) failed_at_ = now;
         paint();
       }
@@ -394,7 +393,6 @@ class Deck : public tessera::InPsram {
     tries_ = 0;
     items_count_ = 0;
     more_ = false;
-    lit_row_ = -1;
     if (!(m["ok"] | false)) {
       // Home Assistant's own words for the refusal, as the app passes them on.
       keep(error_, m["error"] | "");
@@ -561,19 +559,24 @@ class Deck : public tessera::InPsram {
       return;
     }
     const Item &it = items_[i];
+    // The row stays lit as the one picked until another is, across pages and answers asked again.
+    keep(picked_, it.name);
     JsonDocument d;
     d["media_id"] = !it.uri[0] || maybe_cut(it.uri) ? it.name : it.uri;
     d["media_type"] = setup_.kind;
     d["enqueue"] = setup_.enqueue;
     if (tessera::action(PLAY, s->entity, d)) {
       starting_ = true;
-      lit_row_ = i;
       keep(started_, it.name);
       sent_at_ = esphome::millis();
       failed_at_ = 0;
       // A stacked deck turns to what plays.
       if (!three_) view_list_ = false;
       lay_chips();
+    } else {
+      // Not sent (the screen may not perform actions now): say so instead of nothing.
+      keep(started_, it.name);
+      failed_at_ = esphome::millis();
     }
     paint();
   }
@@ -1078,7 +1081,7 @@ class Deck : public tessera::InPsram {
       r.show(there);
       if (!there) continue;
       ui::set_text(r.label, items_[i].name);
-      const bool lit = i == lit_row_;
+      const bool lit = picked_[0] && strcmp(items_[i].name, picked_) == 0;
       ui::set_fill(r.box, lit ? Tone::ACCENT : Tone::NORMAL, surface_);
       ui::set_color(r.label, lit ? theme::ON_ACCENT : theme::INK);
     }
@@ -1105,8 +1108,9 @@ class Deck : public tessera::InPsram {
   Speaker speakers_[SPEAKERS];
   Item items_[ROWS];
   char started_[52] = {};
+  char picked_[52] = {};   // the name of the row last tapped, lit while it is on the page
   char error_[124] = {};
-  int count_ = 0, at_ = 0, filter_ = 0, offset_ = 0, items_count_ = 0, rows_ = 0, lit_row_ = -1, tries_ = 0;
+  int count_ = 0, at_ = 0, filter_ = 0, offset_ = 0, items_count_ = 0, rows_ = 0, tries_ = 0;
   int w_ = 0, h_ = 0, key_ = 0, gap_ = 0, row_h_ = 0, row_gap_ = 0;
   int lib_x_ = 0, lib_w_ = 0, filters_y_ = 0, chips_x_ = 0, chips_room_ = 0;
   int spk_h_ = 0, spk_text_w_ = 0, prog_w_ = 0, move_mid_ = 0, move_y_ = 0, move_h_ = 0, move_room_ = 0;

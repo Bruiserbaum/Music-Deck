@@ -4,7 +4,7 @@
 # Music Assistant holds every account (YouTube Music, Spotify, ...), the screen never sees a login.
 # docs/MANIFEST.md in the plugins repository has every field.
 id: music_deck
-version: 0.2.0
+version: 0.2.1
 # 0.12 a card's taps and actions with a JSON object, 0.14 wish(), 0.15 the extra speakers as entity options, 0.17 the
 # cover of what plays by name (cover:<entity>).
 api: "0.17"
@@ -37,7 +37,8 @@ tiles:
   - id: deck
     name: tile_name
     icon: playlist-music
-    sizes: { min: 1x1, max: 6x6 }
+    # The whole page as well, once the editor offers it to a plugin (docs/MANIFEST.md, "sizes").
+    sizes: { min: 1x1, max: 6x6, full: true }
     # The full deck on its largest size: six speakers with their toggles, what plays (a cover, two lines, the progress
     # and its times), five keys and the volume, six filter chips, two page keys, twelve rows and a note; about 100 LVGL
     # objects, and the speakers and the page of the library in fixed fields.

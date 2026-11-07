@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+- The row you tap stays lit as the one you picked, until you pick another, instead of a blink.
+- A tap that could not be sent says "Did not start" instead of nothing.
+- The tile can take the whole page as soon as Tessera's Layout offers that to plugins.
+
 ## 0.2.0
 - A new look. On a wide screen (10 inches) three columns: your speakers down the left, what plays in the middle, your
   library at the right. On a smaller one the speakers stay at the left and a key switches between what plays and the
